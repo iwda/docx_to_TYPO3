@@ -1,0 +1,403 @@
+<!DOCTYPE html>
+<html ng-app="myApp">
+
+<head>
+
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
+  <script src="https://ajax.googleapis.com/ajax/libs/angularjs/1.6.5/angular.min.js"></script>
+  <title>Word2Digi - IwDa</title>
+  <!-- Controller-Datei -->
+  <script src="controllers/controller.js"></script>
+  <!-- Bootstrap CSS -->
+  <link href="vendor/bootstrap/css/bootstrap.min.css" rel="stylesheet">
+  <!-- Fonts -->
+  <link href="https://fonts.googleapis.com/css?family=Saira+Extra+Condensed:100,200,300,400,500,600,700,800,900" rel="stylesheet">
+  <link href="https://fonts.googleapis.com/css?family=Open+Sans:300,300i,400,400i,600,600i,700,700i,800,800i" rel="stylesheet">
+  <link href="vendor/font-awesome/css/font-awesome.min.css" rel="stylesheet">
+  <link href="vendor/devicons/css/devicons.min.css" rel="stylesheet">
+  <link href="vendor/simple-line-icons/css/simple-line-icons.css" rel="stylesheet">
+  <!-- CSS-Datei -->
+  <link href="css/resume.min.css" rel="stylesheet">
+</head>
+<body id="page-top">
+  <div ng-controller="AppCtrl">
+
+
+    <!-- Navigations-Bar -->
+    <nav class="navbar navbar-expand-lg navbar-dark bg-primary fixed-top" id="sideNav">
+      <a class="navbar-brand js-scroll-trigger" href="#page-top">
+        <span class="d-block d-lg-none">.docx to TYPO3</span>
+        <!-- 1&1 Logo in Navbar -->
+        <span class="d-none d-lg-block">
+          <img class="img-fluid img-profile rounded-circle mx-auto mb-2" src="css/oneandone_logo.jpg" alt="">
+        </span>
+      </a>
+      <button class="navbar-toggler" type="button" data-toggle="collapse" data-target="#navbarSupportedContent" aria-controls="navbarSupportedContent"
+        aria-expanded="false" aria-label="Toggle navigation">
+        <span class="navbar-toggler-icon"></span>
+      </button>
+      <!-- Navbarauswahlliste -->
+      <div class="collapse navbar-collapse" id="navbarSupportedContent">
+        <ul class="navbar-nav">
+          <!-- Navbar: Startseite -->
+          <li class="nav-item">
+            <a class="nav-link js-scroll-trigger" href="#start">Start</a>
+          </li>
+          <!-- Navbar: Deutscher Artikelupload -->
+          <li class="nav-item">
+            <a class="nav-link js-scroll-trigger" href="#german_article_upload">Deutscher Artikel</a>
+          </li>
+          <!-- Navbar: Internationaler Artikelupload -->
+          <li class="nav-item">
+            <a class="nav-link js-scroll-trigger" href="#international_upload">Internationaler Artikel</a>
+          </li>
+          <!-- Navbar: Optionen -->
+          <li class="nav-item">
+            <a class="nav-link js-scroll-trigger" href="#options">Optionen</a>
+          </li>
+        </ul>
+      </div>
+    </nav>
+    <!-- Loading-Screen; Loader geht an sobald Datei zu TYPO3 gesendet wird -->
+    <div style="display:none" id="loader"></div>
+    <!-- "rechte Seite" der App, wird geblurt sobald Loader anspringt -->
+    <div id="großerContainer" class="container-fluid p-0">
+
+
+      <!-- Section: Startseite -->
+      <section class="resume-section p-3 p-lg-5 d-flex d-column" id="start">
+        <div class="my-auto">
+          <h1 class="mb-0">.docx to
+            <span class="text-primary">Typo3</span>
+          </h1>
+          <div class="subheading mb-5">
+          </div>
+          <p class="mb-5">Mit diesem Tool lassen sich Worddateien zu Typo3 ex- und importieren</p>
+      </section>
+
+
+      <!-- Section: Deutscher Artikelaupload -->
+      <section class="resume-section p-3 p-lg-5 d-flex flex-column" id="german_article_upload">
+        <div class="my-auto">
+          <h2 class="mb-5">Deutscher Artikelupload</h2>
+          <!-- ARTIKELAUSWAHL Gesplittet in zwei Teile: Links und rechts -->
+          <div class="resume-item d-flex flex-column flex-md-row mb-5">
+            <!-- Linke Seite -->
+            <div class="resume-content mr-auto">
+              <!-- Nur Text Artikelauswahl -->
+              <h3 class="mb-0">Artikelauswahl</h3>
+              <div class="subheading mb-3">Bitte wählen Sie eine Artikel für den Upload aus</div>
+              <!-- Abhängig von Bedingung -->
+              <ul class="fa-ul mb-0">
+                <!-- Wird angezeigt wenn Artikel erfolgreich ausgewählt wurde -->
+                <li id="firstcheckgreen" style="display:none">
+                  <i class="fa-li fa fa-check"></i>Ausgewählter Artikel:
+                  <b>
+                    <!-- Zeigt Dateinamen des ausgewählten Artikels an -->
+                    <i id="dokupfad"></i>
+                  </b>
+                </li>
+                <!-- Wird angezeigt wenn kein Artikel ausgewählt wurde -->
+                <li id="firstcheckred">Kein gültiger Artikel ausgewählt
+                  <i class="fa-li fa fa-times"></i>
+                </li>
+              </ul>
+            </div>
+            <!-- Rechte Seite -->
+            <div class="resume-date text-md-right">
+              <!-- "Button" mit Dateiauswahl 'input type="file"' -->
+              <li class="list-inline-item">
+                <a href="#">
+                  <span class="fa-stack fa-2x">
+                    <i class="fa fa-circle fa-stack-2x"></i>
+                    <i class="fa fa-file-word-o fa-stack-1x fa-inverse"></i>
+                    <input type="file" id="file" name="file" style: "display: none;"/>
+                  </span>
+                </a>
+              </li>
+            </div>
+          </div>
+          <!-- KATEGORIEAUSWAHL Gesplittet in zwei Teile: Links und rechts -->
+          <div class="resume-item d-flex flex-column flex-md-row mb-5">
+             <!-- Linke Seite Kategorieauswahl-->
+            <div class="resume-content mr-auto">
+              <h3 class="mb-0">Kategorieauswahl</h3>
+              <div class="subheading mb-3">Bitte wählen Sie die Kategorie aus</div>
+              <ul class="fa-ul mb-0">
+                <!-- Wird angezeigt wenn Kategorie erfolgreich ausgewählt wurde -->
+                <li id="Kategoriecheckgreen" style="display:none">Kategorie erfolgreich ausgewählt:
+                  <b>
+                    <!-- Zeigt den ausgewählten Kategorienamen an -->
+                    <i id="katname"></i>
+                  </b>
+                  <i class="fa-li fa fa-check"></i>
+                </li>
+                <!-- Wird angezeigt wenn keine Kategorie ausgewählt wurde -->
+                <li id="Kategoriecheckred">Keine gültige Kategorie ausgewählt
+                  <i class="fa-li fa fa-times"></i>
+                </li>
+              </ul>
+            </div>
+            <!-- Rechte Seite Kategorieauswahl
+            Dropdownmenü mit verfügbaren Kategorien
+            Wird angezeigt, wenn Artikel erfolgreich ausgewählt wurde-->
+            <div id="btnkat" style="visibility:hidden" class="resume-date text-md-right">
+              <a class="btn btn-large btn-primary">
+                <select class="btn btn-large btn-primary" ng-model="item" ng-options="x.title for x in names" ng-change="setSelected()">
+                  {{ item.title }}
+                  <option id="katidtest" value="">- Kategorie wählen -</option>
+                </select>
+              </a>
+            </div>
+          </div>
+          <!-- ARTIKELVORSCHAU Gesplittet in zwei Teile: Links und rechts -->
+          <div class="resume-item d-flex flex-column flex-md-row mb-5">
+            <!-- Linke Seite Artikelvorschau-->
+            <div class="resume-content mr-auto">
+              <h3 class="mb-0">Artikelvorschau</h3>
+              <div class="subheading mb-3">Typo3-Vorschau öffnen</div>
+              <ul class="fa-ul mb-0">
+                <!-- Wird angezeigt wenn Kategorie erfolgreich ausgewählt wurde -->
+                <li id="vorschaucheckgreen" style="display:none">Vorschau verfügbar
+                  <i class="fa-li fa fa-check"></i>
+                </li>
+                <!-- Wird angezeigt wenn keine Kategorie ausgewählt wurde -->
+                <li id="vorschaucheckred">Vorschau nicht verfügbar
+                  <i class="fa-li fa fa-times"></i>
+                </li>
+              </ul>
+            </div>
+             <!-- Rechte Seite Artikelvorschau -->
+            <div class="resume-date text-md-right">
+              <li class="list-inline-item">
+                <!-- Button für Artikelvorschau -->
+                <a id="avorschau" style="visibility:hidden" ng-click="vorschau()">
+                  <span class="fa-stack fa-2x">
+                    <i class="fa fa-circle fa-stack-2x"></i>
+                    <i class="fa fa-search fa-stack-1x fa-inverse"></i>
+                  </span>
+                </a>
+              </li>
+            </div>
+          </div>
+           <!-- TYPO3 UPLOAD Gesplittet in zwei Teile: Links und rechts -->
+          <div class="resume-item d-flex flex-column flex-md-row">
+            <!-- Linke Seite Typo3 Upload-->
+            <div class="resume-content mr-auto">
+              <h3 class="mb-0">Typo3 Upload</h3>
+              <div class="subheading mb-3">Artikel zu Typo3 hochladen</div>
+              <ul class="fa-ul mb-0">
+                <!-- Wird angezeigt wenn Vorschau geöffnet wurde -->
+                <li id="uploadtypogreen" style="display:none">Artikel für Upload zu TYPO3 bereit
+                  <i class="fa-li fa fa-check"></i>
+                </li>
+                <!-- Wird angezeigt wenn Vorschau noch nicht geöffnet wurde -->
+                <li id="uploadtypored">Kein gültiger Artikel für Upload bereit
+                  <i class="fa-li fa fa-times"></i>
+                </li>
+              </ul>
+            </div>
+            <!-- Rechte Seite Typo3 Upload-->
+            <div class="resume-date text-md-right">
+              <li class="list-inline-item">
+                 <!-- Button für Typo3 Upload -->
+                <a id="auploadtypo3" style="visibility:hidden" ng-click="posten()">
+                  <span class="fa-stack fa-2x">
+                    <i class="fa fa-circle fa-stack-2x"></i>
+                    <i class="fa fa-cloud-upload fa-stack-1x fa-inverse"></i>
+                  </span>
+                </a>
+              </li>
+            </div>
+          </div>
+        </div>
+      </section>
+
+
+      <!-- Section: Internationaler Artikelaupload -->
+      <section class="resume-section p-3 p-lg-5 d-flex flex-column" id="international_upload">
+        <div class="my-auto">
+          <h2 class="mb-5">Internationaler Artikelupload</h2>
+          <div class="resume-item d-flex flex-column flex-md-row mb-5">
+            <div class="resume-content mr-auto">
+              <h3 class="mb-0">Artikelauswahl</h3>
+              <div class="subheading mb-3">Bitte wählen Sie eine Artikel für den Upload aus</div>
+              <ul class="fa-ul mb-0">
+                <li id="firstcheckgreenInt" style="display:none">
+                  <i class="fa-li fa fa-check"></i>Ausgewählter Artikel:
+                  <b>
+                    <i id="dokupfadInt"></i>
+                  </b>
+                </li>
+                <li id="firstcheckredInt">Kein gültiger Artikel ausgewählt
+                  <i class="fa-li fa fa-times"></i>
+                </li>
+              </ul>
+            </div>
+            <div class="resume-date text-md-right">
+              <li class="list-inline-item">
+                <a href="#">
+                  <span class="fa-stack fa-2x">
+                    <i class="fa fa-circle fa-stack-2x"></i>
+                    <i class="fa fa-file-word-o fa-stack-1x fa-inverse"></i>
+                    <input type="file" id="fileInt" name="file" style: "display: none;"/>
+                  </span>
+                </a>
+              </li>
+            </div>
+          </div>
+          <div class="resume-item d-flex flex-column flex-md-row mb-5">
+            <div class="resume-content mr-auto">
+              <h3 class="mb-0">Deutschen Artikel auswählen</h3>
+              <div class="subheading mb-3">Bitte wählen Sie die Kategorie aus</div>
+              <ul class="fa-ul mb-0">
+                <li id="KategoriecheckgreenInt" style="display:none">Kategorie erfolgreich ausgewählt:
+                  <b>
+                    <i id="katnameInt"></i>
+                  </b>
+                  <i class="fa-li fa fa-check"></i>
+                </li>
+                <li id="KategoriecheckredInt">Keine gültige Kategorie ausgewählt
+                  <i class="fa-li fa fa-times"></i>
+                </li>
+              </ul>
+            </div>
+            <div id="btnkatInt" style="visibility:hidden" class="resume-date text-md-right">
+              <input type="text" id="myInput" ng-keyup="searchArticle()" placeholder="Deutschen Artikel suchen..." title="Type in a name">
+              <table id="myTable">
+
+                <tbody class="scroll-tbody-y table-body">
+                  <tr ng-repeat="x in articles" ng-click="setSelectedInt()">
+                    <td>{{ x.title }}
+                    </td>
+                    <td>{{ x.uid }}
+                    </td>
+                  </tr>
+                </tbody>
+              </table>
+              </a>
+            </div>
+          </div>
+          <div class="resume-item d-flex flex-column flex-md-row">
+            <div class="resume-content mr-auto">
+              <h3 class="mb-0">Sprachen</h3>
+              <div class="subheading mb-3">
+                <fieldset>
+                  <input type="radio" name="laendercodes" id="US" value="3">
+                  <label for="US">US&nbsp;&nbsp;</label>
+
+                  <input type="radio" name="laendercodes" id="CA" value="4">
+                  <label for="CA">CA&nbsp;&nbsp;</label>
+
+                  <input type="radio" name="laendercodes" id="UK" value="1">
+                  <label for="UK">UK&nbsp;&nbsp;</label>
+
+                  <input type="radio" name="laendercodes" id="ES" value="2">
+                  <label for="ES">ES&nbsp;&nbsp;</label>
+
+                  <input type="radio" name="laendercodes" id="MX" value="6">
+                  <label for="MX">MX&nbsp;&nbsp;</label>
+
+                  <input type="radio" name="laendercodes" id="FR" value="5">
+                  <label for="FR">FR&nbsp;&nbsp;</label>
+
+                  <input type="radio" name="laendercodes" id="IT" value="7">
+                  <label for="IT">IT&nbsp;&nbsp;</label>
+                  <!--
+                  <input type="radio" name="laendercodes" id="USCA" value="8">
+                  <label for="USCA">US/CA&nbsp;&nbsp;</label>
+
+                  <input type="radio" name="laendercodes" id="USCAUK" value="9">
+                  <label for="USCAUK">US/CA/UK&nbsp;&nbsp;</label>
+
+                  <input type="radio" name="laendercodes" id="ESMX" value="10">
+                  <label for="ESMX">ES/MX&nbsp;&nbsp;</label>-->
+                </fieldset>
+              </div>
+            </div>
+          </div>
+          <div class="resume-item d-flex flex-column flex-md-row mb-5">
+            <div class="resume-content mr-auto">
+              <h3 class="mb-0">Artikelvorschau</h3>
+              <div class="subheading mb-3">Typo3-Vorschau öffnen</div>
+              <ul class="fa-ul mb-0">
+                <li id="vorschaucheckgreenInt" style="display:none">Vorschau verfügbar
+                  <i class="fa-li fa fa-check"></i>
+                </li>
+                <li id="vorschaucheckredInt">Vorschau nicht verfügbar
+                  <i class="fa-li fa fa-times"></i>
+                </li>
+              </ul>
+            </div>
+            <div class="resume-date text-md-right">
+              <li class="list-inline-item">
+                <a id="avorschauInt" style="visibility:hidden" ng-click="vorschauInt()">
+                  <span class="fa-stack fa-2x">
+                    <i class="fa fa-circle fa-stack-2x"></i>
+                    <i class="fa fa-search fa-stack-1x fa-inverse"></i>
+                  </span>
+                </a>
+              </li>
+            </div>
+          </div>
+          <div class="resume-item d-flex flex-column flex-md-row">
+            <div class="resume-content mr-auto">
+              <h3 class="mb-0">Typo3 Upload</h3>
+              <div class="subheading mb-3">Artikel zu Typo3 hochladen</div>
+              <ul class="fa-ul mb-0">
+                <li id="uploadtypogreenInt" style="display:none">Artikel für Upload zu TYPO3 bereit
+                  <i class="fa-li fa fa-check"></i>
+                </li>
+                <li id="uploadtyporedInt">Kein gültiger Artikel für Upload bereit
+                  <i class="fa-li fa fa-times"></i>
+                </li>
+              </ul>
+            </div>
+            <div class="resume-date text-md-right">
+              <li class="list-inline-item">
+                <a id="auploadtypo3Int" style="visibility:hidden" ng-click="postenInt()">
+                  <span class="fa-stack fa-2x">
+                    <i class="fa fa-circle fa-stack-2x"></i>
+                    <i class="fa fa-cloud-upload fa-stack-1x fa-inverse"></i>
+                  </span>
+                </a>
+              </li>
+            </div>
+          </div>
+        </div>
+      </section>
+      <section class="resume-section p-3 p-lg-5 d-flex flex-column" id="options">
+        <div class="my-auto">
+          <h2 class="mb-5">Optionen</h2>
+          <div class="subheading mb-3">Hier können Sie Optionen vornehmen</div>
+          <div class="subheading mb-3">Bitte wählen Sie Ihre Optionen aus:</div>
+          <label>
+            <input id="checkCodeSnippet" type="checkbox" name="zutat" value="Code-Snippets" > Code-Snippets
+          </label>
+          <br/>
+          <label>
+            <input id="checkHTML" type="checkbox" name="zutat" value="HTML-Code" checked> HTML-Code
+          </label>
+          <br/>
+          <label>
+            <input id="checkUeberschriften" type="checkbox" name="zutat" value="Überschriften" checked> Überschriften
+          </label>
+          <br/>
+          <br/>
+          <button type="button" class="btn btn-lg btn-primary" ng-click="speicherOptionen()">Speichern</button>
+        </div>
+        
+      </section>
+     
+    </div>
+  </div>
+  <!-- Bootstrap core JavaScript -->
+  <script src="vendor/jquery/jquery.min.js"></script>
+  <script src="vendor/bootstrap/js/bootstrap.bundle.min.js"></script>
+  <!-- Plugin JavaScript -->
+  <script src="vendor/jquery-easing/jquery.easing.min.js"></script>
+  <!-- Custom scripts for this template -->
+  <script src="js/resume.min.js"></script>
+</body>
+</html>

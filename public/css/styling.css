@@ -1,0 +1,57 @@
+.btn-primary {
+    position: relative;
+    overflow: hidden;
+}
+.btn-primary input[type=file] {
+    position: absolute;
+    top: 0;
+    right: 0;
+    min-width: 100%;
+    min-height: 100%;
+    font-size: 100px;
+    text-align: right;
+    filter: alpha(opacity=0);
+    opacity: 0;
+    outline: none;
+    background: white;
+    cursor: inherit;
+    display: block;
+}
+.glyphicon {
+    color: white;
+}
+.left-side {
+    float: left;
+    width: auto;
+    background: black;
+    padding: 50px 50px 50px 50px;
+    font-size: 30px;
+    text-align: center;
+}
+.nav > li > a:hover{
+    background-color: black;
+}
+
+#ueberschrift{
+    background-color: #3263a5;
+    color: white;
+    font-weight: bold;
+    padding: 10px 10px 10px 10px;
+
+}
+#tabelleneigenschaft {
+    white-space: pre-wrap;
+}
+.divClass {
+background: #f5f5f5;
+border: 1px solid #DDD;
+box-shadow: 3px 3px 0px rgba(0,0,0, .2);
+
+
+
+ 
+    margin-top: 20px;
+    margin-bottom: 20px;
+    font-family: Arial,Helvetica,clean,sans-serif;
+}
+
