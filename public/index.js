@@ -15,7 +15,7 @@ var path = require('path')
 /**
  * @description HTML-Tags die cheerio fürs Parsen berücksichtigen soll
  */
-var htmlTags = 'p,h1,h2,h3,h4,table,ul,ol,a,test,codesnippet';
+var htmlTags = 'p,h1,h2,h3,h4,table,ul,ol,a,tippbox,codesnippet';
 
 /**
  * @description Pfad von Ordner in dem Texte gespeichert sind und in dem HTML-Dateien abzulegen sind
@@ -95,87 +95,61 @@ router.get('/get_ger_article', function(req, res) {
 function transformToJSON (req, ordnerPfad, htmlFileName){
 
   const $ = cheerio.load(fs.readFileSync(ordnerPfad + htmlFileName)); //HTML-Datei mit cheerio laden
-  
-  /*if (pContent.includes('{{') && pContent.includes('}}')){
-    var strOriginal = $(htmlTags).eq(t+1).html();
-    var newStr = strOriginal.substring(strOriginal.lastIndexOf('{')+1,strOriginal.lastIndexOf('}')-1);
-    var res = newStr.split('|');
-    var buildStr = "<link "+res[1]+" - external-link-window \""+res[2]+"\">"+res[0]+"</link>";
-    newStr = "{{" + newStr + "}}";
-    var nochStrOriginal = strOriginal.replace(newStr,buildStr);
-    var pContentNew = "<p>"+nochStrOriginal+"</p>";
-    pContent = pContentNew;
-  }*/
-  
+
+  /**
+  * Vorabkonfigurationen für TippBoxen, CodeSnippets und Bildern im Texte
+  */
+
+  //Array für alle Indexes von <p> in denen die Zeichenkette '**CODE**' vorkommt
   var codeIndexes = [];
-  
   $('p').each(function(i, elem){
     if($(this).text().startsWith('**CODE**')){
-      codeIndexes.push(i);
+      codeIndexes.push(i); //Indexe in Array speichern
     }
   });
 
-  var lange = codeIndexes.length/2;
-
-  var inhaltLange = [];
-  for(r = 0; r < lange; r++){
-    inhaltLange.push(codeIndexes[0]);
-    inhaltLange.push(codeIndexes[1]-codeIndexes[0]-1);
-    $('p').eq(codeIndexes[0]).empty();
-    $('p').eq(codeIndexes[1]).empty();
-    codeIndexes.shift();
-    codeIndexes.shift();
+  //Da es immer "ein Paar" gibt von **Code** muss hier durch Zwei geteilt werden, damit die Schleife nicht doppelt läuft
+  var laenge = codeIndexes.length/2;
+  //Array in dem zuerst der Index gespeichert wird und dann wie viele Schritte bist zum Nächsten, dann Wiederholung
+  var indexLaenge = []; 
+  for(r = 0; r < laenge; r++){
+    indexLaenge.push(codeIndexes[0]);
+    indexLaenge.push(codeIndexes[1]-codeIndexes[0]-1);
+    $('p').eq(codeIndexes[0]).empty(); //Zeile aus HTML löschen
+    $('p').eq(codeIndexes[1]).empty(); //Zeile aus HTML löschen
+    codeIndexes.shift(); //Vom Anfang des Arrays löschen
+    codeIndexes.shift(); //Vom Anfang des Arrays löschen
   }
 
-  console.log(inhaltLange)
-  for(dc = 0; dc < lange; dc++){
-    for(cd = 0; cd < inhaltLange[1]; cd++){
-        //inhaltLange[0] = inhaltLange[0]+1;
-        console.log(inhaltLange[0]+1);
-      
-        var lul = $('p').eq(inhaltLange[0]+1);
-        var lal = $('p').eq(inhaltLange[0]+1).text()
-        var lel = $('<codesnippet>'+lal+'</codesnippet>');
-        $(lul).replaceWith(lel);
-       
-        //$('p').eq(inhaltLange[0]).replaceWith('<codesnippet>Toller Text</codesnippet>')
-        //var codeSn = $('p').eq(inhaltLange[0]);
-        //var codeSnNew = $('<codesnippet>'+$('p').eq(inhaltLange[0]).text()+'</codesnippet>');
-        //codeSn.replaceWith(codeSnNew);
-        //$('codesnippet').empty();
-        
-       
+  for(s = 0; s < laenge; s++){
+    for(u = 0; u < indexLaenge[1]; u++){
+      var lul = $('p').eq(indexLaenge[0]+1);
+      /////////!!!!!!!!CONSOLEN!
+      var lal = $('p').eq(indexLaenge[0]+1).text()
+      var lel = $('<codesnippet>'+lal+'</codesnippet>');
+      $(lul).replaceWith(lel);           
     }
-    var zahl = inhaltLange[1];
-    inhaltLange.shift();
-    inhaltLange.shift();
-    inhaltLange[0] -=zahl;
+    var zahl = indexLaenge[1];
+    indexLaenge.shift(); //Vom Anfang des Arrays löschen
+    indexLaenge.shift(); //Vom Anfang des Arrays löschen
+    indexLaenge[0] -=zahl;
   }
 
-
-
-  //Ändert alle Tags für Tippboxen von <p> in <test>
+  //Ändert alle Tags für Tippboxen von <p> in <tippbox>
   $('p').each(function(i, elem){
-    if($(this).text().startsWith('[[')&&$(this).text().endsWith(']]') ){
-      var test = $('<test>'+$(this).text()+'</test>');
-
-      $(this).replaceWith(test);
+    if($(this).text().startsWith('[[') && $(this).text().endsWith(']]') ){
+      var tippbox = $('<tippbox>'+$(this).text()+'</tippbox>');
+      $(this).replaceWith(tippbox);
     }
   });
-
-
 
   //Alle Images löschen mit Bildunterschrift und Alt-Tag
   $('img').each(function(i, elem){
     var zahler = $(this).parent().index();
-    $(htmlTags).eq(zahler+3).replaceWith('');
-    $(htmlTags).eq(zahler+2).replaceWith('');
+    $(htmlTags).eq(zahler+3).replaceWith(''); //Bildunterschrift löschen
+    $(htmlTags).eq(zahler+2).replaceWith(''); //Alt-Tag löschen
     $(this).replaceWith('');
   });
-  
-
-    
-  
 
   /** Hier wird der initiale JSON-Datensatz angelegt
   * @todo Es wird noch alles in das Feld 'content[]' gespeichert, schöner wäre unterschiedliche Felder (meta, content, ...)
@@ -225,7 +199,7 @@ function transformToJSON (req, ordnerPfad, htmlFileName){
       var htmlBodydecoded = ""; // Dekodierter HTML Code, der in den JSON-Datensatz kommt
 
       //Die Schleife geht nur soweit, bis das nächste passende Element gefunden wurde um eine neue Content-Box anzulegen
-      for (t = i; t < i + $(htmlTags).eq(i).nextUntil('h1,h2,h3,h4,table,test,codesnippet').length; t++) {
+      for (t = i; t < i + $(htmlTags).eq(i).nextUntil('h1,h2,h3,h4,table,tippbox,codesnippet').length; t++) {
 
         if ($(htmlTags).get(t + 1).tagName == "p") {
 
@@ -268,7 +242,7 @@ function transformToJSON (req, ordnerPfad, htmlFileName){
       }
 
       //Die Schleife ist nötig um den Zähler zurückzusetzen, wenn Schleife nicht läuft, dann werden immer die alten Tags noch angeschaut
-      for (t = i; t < i + $(htmlTags).eq(i).nextUntil('h1,h2,h3,h4,table,test,codesnippet').length; t++) {
+      for (t = i; t < i + $(htmlTags).eq(i).nextUntil('h1,h2,h3,h4,table,tippbox,codesnippet').length; t++) {
         $(htmlTags).eq(t + 1).empty();
       }
 
@@ -302,7 +276,7 @@ function transformToJSON (req, ordnerPfad, htmlFileName){
       var htmlBodydecoded = ""; // Dekodierter HTML Code, der in den JSON-Datensatz kommt
 
       //Die Schleife geht nur soweit, bis das nächste passende Element gefunden wurde um eine neue Content-Box anzulegen
-      for (t = i; t < i + $(htmlTags).eq(i).nextUntil('h1,h2,h3,h4,table,test,codesnippet').length; t++) {
+      for (t = i; t < i + $(htmlTags).eq(i).nextUntil('h1,h2,h3,h4,table,tippbox,codesnippet').length; t++) {
 
         if ($(htmlTags).get(t + 1).tagName == "p") {
 
@@ -346,7 +320,7 @@ function transformToJSON (req, ordnerPfad, htmlFileName){
       }
 
       //Die Schleife ist nötig um den Zähler zurückzusetzen, wenn Schleife nicht läuft, dann werden immer die alten Tags noch angeschaut
-      for (t = i; t < i + $(htmlTags).eq(i).nextUntil('h1,h2,h3,h4,table,test,codesnippet').length; t++) {
+      for (t = i; t < i + $(htmlTags).eq(i).nextUntil('h1,h2,h3,h4,table,tippbox,codesnippet').length; t++) {
         $(htmlTags).eq(t + 1).empty();
       }
 
@@ -380,7 +354,7 @@ function transformToJSON (req, ordnerPfad, htmlFileName){
       var htmlBodydecoded = ""; // Dekodierter HTML Code, der in den JSON-Datensatz kommt
 
       //Die Schleife geht nur soweit, bis das nächste passende Element gefunden wurde um eine neue Content-Box anzulegen
-      for (t = i; t < i + $(htmlTags).eq(i).nextUntil('h1,h2,h3,h4,table,test,codesnippet').length; t++) {
+      for (t = i; t < i + $(htmlTags).eq(i).nextUntil('h1,h2,h3,h4,table,tippbox,codesnippet').length; t++) {
 
         if ($(htmlTags).get(t + 1).tagName == "p") {
 
@@ -424,7 +398,7 @@ function transformToJSON (req, ordnerPfad, htmlFileName){
       }
 
       //Die Schleife ist nötig um den Zähler zurückzusetzen, wenn Schleife nicht läuft, dann werden immer die alten Tags noch angeschaut
-      for (t = i; t < i + $(htmlTags).eq(i).nextUntil('h1,h2,h3,h4,table,test,codesnippet').length; t++) {
+      for (t = i; t < i + $(htmlTags).eq(i).nextUntil('h1,h2,h3,h4,table,tippbox,codesnippet').length; t++) {
         $(htmlTags).eq(t + 1).empty();
       }
 
@@ -511,22 +485,50 @@ function transformToJSON (req, ordnerPfad, htmlFileName){
           
         }
 
-        if(res[0]=="Tipp" || res [0]=="Tip"){
+        if(res[0]=="Tipp" || res [0]=="Tip" || res [0]=="Consejo" || res [0]=="Conseil" || res [0]=="Consiglio"){
           jsonData.content.push({
             'tippBoxTitle' : res[0],
             'tippBoxContent' : res[1],
             'layout' : '3',
             'icon': 'lightbulb-o'
           });
-        } else if (res[0]=="Fakt" || res [0]=="Fact"){
+        } else if (res[0]=="Fakt" || res [0]=="Fact" || res [0]=="Hecho" || res [0]=="Remarque" || res [0]=="Fatto"){
           jsonData.content.push({
             'tippBoxTitle' : res[0],
             'tippBoxContent' : res[1],
             'layout' : '2',
             'icon': 'thumb-tack'
           });
+        } else if (res[0]=="Fazit" || res [0]=="Summary" || res [0]=="En resumen" || res [0]=="En résumé" || res [0]=="In sintesi"){
+          jsonData.content.push({
+            'tippBoxTitle' : res[0],
+            'tippBoxContent' : res[1],
+            'layout' : '2',
+            'icon': 'bars'
+          }); 
+        } else if (res[0]=="Zitat" || res [0]=="Quote" || res [0]=="Cita" || res [0]=="Citation" || res [0]=="Citazione"){
+          jsonData.content.push({
+            'tippBoxTitle' : res[0],
+            'tippBoxContent' : res[1],
+            'layout' : '2',
+            'icon': 'quote-left'
+          });
+        } else if (res[0]=="Hinweis" || res [0]=="Note" || res [0]=="Nota" || res [0]=="N.B."){
+          jsonData.content.push({
+            'tippBoxTitle' : res[0],
+            'tippBoxContent' : res[1],
+            'layout' : '3',
+            'icon': 'exclamation'
+          });
+        } else {
+          jsonData.content.push({
+            'tippBoxTitle' : res[0],
+            'tippBoxContent' : res[1],
+            'layout' : '2',
+            'icon': 'lightbulb-o'
+          });
         }
-
+ 
       
     }   
     //P: Text extrahieren der mit dem <p>-Tag umschlossen ist
@@ -538,9 +540,9 @@ function transformToJSON (req, ordnerPfad, htmlFileName){
         Hier findet die Berechnung statt, an welcher Stelle die Inhaltsangabe ist,
         damit diese entsprechend in den JSON-Datensatz aufgenommen werden kann
       */
-      for (t = i; t < i + $(htmlTags).eq(i).nextUntil('h1,h2,h3,h4,table,ul,test').length; t++) {
+      for (t = i; t < i + $(htmlTags).eq(i).nextUntil('h1,h2,h3,h4,table,ul,tippbox,codesnippet').length; t++) {
         if ($(htmlTags).eq(t + 1).text() == "_TABLE_OF_CONTENT_") {
-          tocZahler = i + $(htmlTags).eq(i).nextUntil('h1,h2,h3,h4,table,ul,test').length - $(htmlTags).eq(t + 1).index();
+          tocZahler = i + $(htmlTags).eq(i).nextUntil('h1,h2,h3,h4,table,ul,tippbox,codesnippet').length - $(htmlTags).eq(t + 1).index();
         }
       }
 
@@ -562,12 +564,12 @@ function transformToJSON (req, ordnerPfad, htmlFileName){
       var pContent = "<p>" + $(htmlTags).eq(i).text() + "</p>"; // Alles was innerhalb von <p>...</p> steht abspeichern
 
       if ($(htmlTags).eq(i).text() != "") {
-        for (t = i; t < i + $(htmlTags).eq(i).nextUntil('h1,h2,h3,h4,table,ul,test,codesnippet').length - tocZahler; t++) {
+        for (t = i; t < i + $(htmlTags).eq(i).nextUntil('h1,h2,h3,h4,table,ul,tippbox,codesnippet').length - tocZahler; t++) {
           if ($(htmlTags).eq(t + 1).html() != "_TABLE_OF_CONTENT_") {
             pContent += "<p>" + $(htmlTags).eq(t + 1).html() + "</p>";
           }
         }
-        for (t = i; t < i + $(htmlTags).eq(i).nextUntil('h1,h2,h3,h4,table,ul,test,codesnippet').length - tocZahler; t++) {
+        for (t = i; t < i + $(htmlTags).eq(i).nextUntil('h1,h2,h3,h4,table,ul,tippbox,codesnippet').length - tocZahler; t++) {
           if ($(htmlTags).eq(t + 1).text() != "_TABLE_OF_CONTENT_") {
             $(htmlTags).eq(t + 1).empty();
           }

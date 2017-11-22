@@ -81,6 +81,7 @@ table tr:nth-child(even) {
 {
     display: block;
     overflow-y: scroll;
+    width: min-content;
 }
 
 .table-body{
@@ -88,7 +89,8 @@ table tr:nth-child(even) {
 }
 
 #myInput {
-    min-width: -webkit-fill-available;
+   min-width: -webkit-fill-available;
+
 }
 
 body{

@@ -183,7 +183,15 @@ int_router.get('/vorschau_oeffnen_int', function(req, res) {
         inhalte.push("<div id=\""+divZahl+"\" class=divClass>");
          inhalte.push("<div id=\"ueberschrift\">Inhaltsangabe</div>");
         inhalte.push("</div>");
-      } 
+      } else if (resultTrans.content[i].codeSnippet != undefined && resultTrans.content[i].leer != undefined && resultTrans.content[i].noHeaderCodeSnippet != undefined){
+        inhalte.push("<div id=\""+divZahl+"\" class=divClass>");
+        inhalte.push("<div id=\"ueberschrift\">CodeSnippet</div><br/>"+resultTrans.content[i].codeSnippet + "</br>");
+        inhalte.push("</div>");
+      } else if (resultTrans.content[i].tippBoxTitle != undefined && resultTrans.content[i].tippBoxContent != undefined && resultTrans.content[i].icon != undefined){
+        inhalte.push("<div id=\""+divZahl+"\" class=divClass>");
+        inhalte.push("<div id=\"ueberschrift\">TipBox: "+resultTrans.content[i].tippBoxTitle+" -> "+resultTrans.content[i].icon+"</div><br/>"+resultTrans.content[i].tippBoxContent + "</br>");
+        inhalte.push("</div>");
+      }
     }
   inhalte.push("</body></html>"); 
   inhalte.push("</html>"); 
